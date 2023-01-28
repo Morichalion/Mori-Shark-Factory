@@ -2,7 +2,7 @@
 A simple tool that abstracts the command-line arguments for nod-ai/SHARK
 Works 
 
-It's written in Godot 4 beta 15. 
+It's written in Godot 4 beta 15. Mono version. 
 
 I only tested this on Windows. 
 
@@ -23,4 +23,6 @@ Currently it only works with the regular install, the .exe will not work.
 11. Have fun. 
 
 
-The output is set write to a directory on desktop (~\Desktop\Mori-Shark-Factory\sharkOutputs). The 
+The output is set write to a directory on desktop (~\Desktop\Mori-Shark-Factory\sharkOutputs). The shark install location is saved in appdata. 
+
+If anyone's good with c# and wants to review the code lemme know. 
