@@ -80,9 +80,7 @@ public partial class top : Control
 			GetNode<Control>("Data Entry").Visible = false;
 		} else { GetNode<Control>("Prompts").Visible = false; GetNode<Control>("Data Entry").Visible = true; }
 		if(opt.Text == "Negative Prompt") { tex.Text = negativePrompt; }
-		if(opt.Text == "Seed") { tex.Text = seed.ToString(); }
 		if (opt.Text == "Shark Install") { tex.Text = sharkLocation; }
-		if(opt.Text == "Output Directory") { tex.Text = outputLocation; }
 	}
 	
 	public override void _Process(double delta)
@@ -93,6 +91,7 @@ public partial class top : Control
 			{
 				werking = false;
                 GetNode<Button>("Button").Text = "Generate";
+				GetNode<Label>("Prompts/error").Text = er;
             }
 		}
 	}
@@ -101,13 +100,15 @@ public partial class top : Control
 	int seed = 42;
 	Task ta;
 	bool werking = false;
+	string er = "";
 	public void generate()
 	{
 		if (System.IO.Directory.Exists(outputLocation + "\\sharkOutputs") == false)
 		{
 			System.IO.Directory.CreateDirectory(outputLocation + "\\sharkOutputs");
 		}
-		if(settingsCurrent == false)
+        GetNode<Label>("Prompts/error").Text = "...working...";
+        if (settingsCurrent == false)
 		{
 			settingsCurrent = true;
 			GD.Print(settingsLocation);
@@ -132,6 +133,7 @@ public partial class top : Control
 			int steps = 0;
 			int.TryParse(ss, out steps);
 			if(steps <1) { steps = 1; }
+			string hfModel = GetNode<LineEdit>("Prompts/HF model").Text;
 			
 
             ta = Task.Run(() =>
@@ -150,7 +152,7 @@ public partial class top : Control
 
 				string sharkLoc = sharkLocation + "\\shark\\examples\\shark_inference\\stable_diffusion";
 				string outputLoc = outputLocation + "sharkOutputs";
-				string flags = " --no-progress_bar";
+				string flags = "";// = " --no-progress_bar";
 				if (prompt.Trim().Length > 0)
 				{
 					flags += " --prompts \""+prompt+"\"";
@@ -160,24 +162,40 @@ public partial class top : Control
 				flags += " --seed " + seed.ToString();
 				flags += " --runs " + runs;
 				flags += " --steps " + steps;
+				//stuff for custom models
+				if (hfModel.Trim().Length > 0) { flags += " --hf_model_id=\""+hfModel+"\" --import_mlir"; }
 
-				cmd = new Process();
+
+                cmd = new Process();
 				cmd.StartInfo.FileName = "cmd.exe";
 				cmd.StartInfo.RedirectStandardInput = true;
 				cmd.StartInfo.RedirectStandardOutput = true;
+				cmd.OutputDataReceived += new DataReceivedEventHandler((sender,e) =>
+				{
+					if (!string.IsNullOrEmpty(e.Data))
+					{
+						GD.Print(e.Data);
+						if(e.Data.Contains("Tuned models are currently not supported for this setting"))
+						{
+							er = e.Data;
+						}
+					}
+				});
 				//cmd.StartInfo.CreateNoWindow = true;
 				//cmd.StartInfo.UseShellExecute = false;
 				cmd.Start();
+				cmd.BeginOutputReadLine();
 				cmd.StandardInput.WriteLine(sharkLocation + "\\shark.venv\\Scripts\\activate.bat");
 				string COM = "python " + sharkLoc + "\\main.py " + flags;
 				GD.Print("Comman string: " + COM);
 				cmd.StandardInput.WriteLine(COM);
 
 
-
+				
 
 
 				cmd.StandardInput.Flush();
+				//GD.Print(cmd.StandardOutput.ReadToEnd());
 				cmd.StandardInput.Close();
 				cmd.WaitForExit();
 

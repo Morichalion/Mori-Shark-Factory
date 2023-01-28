@@ -136,6 +136,32 @@ offset_right = 408.0
 offset_bottom = 311.0
 text = "Steps"
 
+[node name="HF model" type="LineEdit" parent="Prompts"]
+offset_left = 25.0
+offset_top = 421.0
+offset_right = 257.0
+offset_bottom = 452.0
+
+[node name="hf label" type="Label" parent="Prompts"]
+offset_left = 24.0
+offset_top = 369.0
+offset_right = 211.0
+offset_bottom = 395.0
+text = "Huggingface model"
+
+[node name="hf label2" type="Label" parent="Prompts"]
+offset_left = 31.0
+offset_top = 390.0
+offset_right = 218.0
+offset_bottom = 416.0
+text = "eg. dreamlike-art/dreamlike-diffusion-1.0"
+
+[node name="error" type="Label" parent="Prompts"]
+offset_left = 29.0
+offset_top = 466.0
+offset_right = 347.0
+offset_bottom = 492.0
+
 [connection signal="text_changed" from="Data Entry/text" to="." method="_on_text_edit_text_changed"]
 [connection signal="item_selected" from="OptionButton" to="." method="_onOptionChange"]
 [connection signal="button_up" from="Button" to="." method="generate"]
